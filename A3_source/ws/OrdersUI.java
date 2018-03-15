@@ -30,7 +30,7 @@ public class OrdersUI
 	{
 		boolean done = false;						// main loop flag
 		boolean error = false;						// error flag
-		char    option;								// Menu choice from user
+		String    option;							// Menu choice from user
 		Console c = System.console();				// Press any key
 		String  date = null;						// order date
 		String  first = null;						// customer first name
@@ -55,18 +55,43 @@ public class OrdersUI
 			System.out.println( "\n\n\n\n" );
 			System.out.println( "Orders Database User Interface: \n" );
 			System.out.println( "Select an Option: \n" );
-			System.out.println( "1: Retrieve all orders in the order database." );
-			System.out.println( "2: Retrieve an order by ID." );
-			System.out.println( "3: Add a new order to the order database." );				
+			System.out.println( "1: Login." );
+			System.out.println( "2: Register." );
+			System.out.println( "3: Retrieve all orders in the order database." );
+			System.out.println( "4: Retrieve an order by ID." );
+			System.out.println( "5: Add a new order to the order database." );
+			System.out.println( "6: Delete an order from the order database." );				
 			System.out.println( "X: Exit\n" );
 			System.out.print( "\n>>>> " );
-			option = keyboard.next().charAt(0);	
-			keyboard.nextLine();	// Removes data from keyboard buffer. If you don't clear the buffer, you blow 
+			option = keyboard.nextLine();	
+			//keyboard.nextLine();	// Removes data from keyboard buffer. If you don't clear the buffer, you blow 
 									// through the next call to nextLine()
+
+
 
 			//////////// option 1 ////////////
 
-			if ( option == '1' )
+			//option 1 for login
+			if ( option.equals("1") )
+			{
+				System.out.println("\nPress enter to continue..." );
+				c.readLine();
+			}
+
+			//////////// option 2 ////////////
+
+			//option 2 for register
+			else if ( option.equals("2") )
+			{
+				System.out.println("\nPress enter to continue..." );
+				c.readLine();
+			}
+
+			//////////// option 3 ////////////
+
+			//option 3 for retrieve orders
+
+			else if ( option.equals("3") )
 			{
 				// Here we retrieve all the orders in the order database
 
@@ -87,9 +112,10 @@ public class OrdersUI
 
 			} // if
 
-			//////////// option 2 ////////////
+			//////////// option 4 ////////////
 
-			if ( option == '2' )
+			//option 4 for retrieve specific order
+			else if ( option.equals("4") )
 			{
 				// Here we get the order ID from the user
 
@@ -129,9 +155,10 @@ public class OrdersUI
 
 			} // if
 
-			//////////// option 3 ////////////
+			//////////// option 5 ////////////
 
-			if ( option == '3' )
+			//option 5 create a new order
+			else if ( option.equals("5") )
 			{
 				// Here we create a new order entry in the database
 
@@ -161,9 +188,9 @@ public class OrdersUI
 				System.out.println("==============================");					
 				System.out.println("\nPress 'y' to create this order:");
 
-				option = keyboard.next().charAt(0);
+				option = keyboard.nextLine();
 
-				if (( option == 'y') || (option == 'Y'))
+				if ( (option.equals("y")) || (option.equals("Y")) )
 				{
 					try
 					{
@@ -185,20 +212,70 @@ public class OrdersUI
 				System.out.println("\nPress enter to continue..." );
 				c.readLine();
 
-				option = ' '; //Clearing option. This incase the user enterd X/x the program will not exit.
+				//option = " "; //Clearing option. This incase the user enterd X/x the program will not exit.
 
 			} // if
 
+			//////////// option 6 ////////////
+
+			//option 6 delete an order
+			else if ( option.equals("6") )
+			{
+				error = true;
+
+				while (error)
+				{
+					System.out.print( "\nEnter the order ID: " );
+					orderid = keyboard.nextLine();
+
+					try
+					{
+						Integer.parseInt(orderid);
+						error = false;
+					} catch (NumberFormatException e) {
+
+						System.out.println( "Not a number, please try again..." );
+						System.out.println("\nPress enter to continue..." );
+
+					} // if
+
+				} // while
+
+				try
+				{
+					response = api.retrieveOrders(orderid);
+					System.out.println(response);
+
+				} catch (Exception e) {
+
+					System.out.println("Request failed:: " + e);
+					
+				}
+
+				System.out.println("\nPress enter to continue..." );
+				c.readLine();
+				System.out.println("\nPress enter to continue..." );
+				c.readLine();
+			}
+
 			//////////// option X ////////////
 
-			if ( ( option == 'X' ) || ( option == 'x' ))
+			else if ( ( option.equals("X")) || ( option.equals("x")) )
 			{
 				// Here the user is done, so we set the Done flag and halt the system
 
 				done = true;
 				System.out.println( "\nDone...\n\n" );
 
-			} // if
+			}
+
+			// no such option
+			else
+			{
+				System.out.println("\nNo such option!" );
+				System.out.println("Press enter to continue..." );
+				c.readLine();
+			}
 
 		} // while
 
