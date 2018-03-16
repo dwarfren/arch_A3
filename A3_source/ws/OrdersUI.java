@@ -42,7 +42,11 @@ public class OrdersUI
 		Scanner keyboard = new Scanner(System.in);	// keyboard scanner object for user input
 		DateTimeFormatter dtf = null;				// Date object formatter
 		LocalDate localDate = null;					// Date object
-		WSClientAPI api = new WSClientAPI();	// RESTful api object
+		WSClientAPI api = new WSClientAPI();	    // RESTful api object
+
+		String username = null;                     // user name for register
+		String password1 = null;                    // password1 for registter
+		String password2 = null;                    // password2 for regirster
 
 		/////////////////////////////////////////////////////////////////////////////////
 		// Main UI loop
@@ -83,6 +87,55 @@ public class OrdersUI
 			//option 2 for register
 			else if ( option.equals("2") )
 			{
+				System.out.println( "\nRegister - Provide the username and password::" );
+				
+
+				error = false;
+				while (!error) 
+				{
+					System.out.print( "Enter the username: " );
+					username = keyboard.nextLine(); // enter user name
+					if (username.length() > 256) // length of the username should be <= 256
+					{
+						System.out.print( "The length of the username should be no more than 256, please input again!\n" );
+					}
+					else
+					{
+						error = true;
+					}
+				}
+				
+
+				error = false;
+				while (!error)
+				{
+					//enter password twice
+					System.out.print( "Enter the password: " );
+					password1 = keyboard.nextLine();
+					System.out.print( "Enter the password again: " );
+					password2 = keyboard.nextLine();
+
+					if (password1.equals(password2))// two input should be the same
+					{
+						error = true;
+					}
+					else
+					{
+						System.out.print( "\nThe two passwords are NOT the same, please enter the password again!" );
+					}
+				}
+
+				try
+				{
+					response = api.createUser(username, password1);
+					System.out.println(response);
+
+				} catch (Exception e) {
+
+					System.out.println("Request failed:: " + e);
+					
+				}
+
 				System.out.println("\nPress enter to continue..." );
 				c.readLine();
 			}
