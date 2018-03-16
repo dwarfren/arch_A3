@@ -27,8 +27,8 @@
 
 var mysql   = require("mysql");     //Database
 var fs = require("fs");             // file system
-var user = "";                      // user name
-var crypto = require('crypto');
+var username = "";                  // login user name
+var crypto = require('crypto');     // password
 
 // calculateSaltAndHashForPassword - calculate the salt and the hash for user's password
 // password paramdter is the user's password
@@ -43,6 +43,17 @@ function calculateSaltAndHashForPassword(password) {
         salt:salt,
         hashValue:value
     };
+}
+
+// calculateHashForPassword - calculate the hash for user's password
+// password paramdter is the user's password
+// return the hash
+
+function calculateHashForPassword(salt, password) {
+    var hash = crypto.createHmac('sha512', salt); /** Hashing algorithm sha512 */
+    hash.update(password);
+    var value = hash.digest('hex');
+    return value;
 }
 
 // write log - write the user operation into log file
@@ -137,8 +148,6 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
             }
             writeLog("operation: " + query + " result: " + log_message);
         });
-
-        writeLog(query + " " + log_message);
     });
 
     // DELETE for /orders/order id specifier - delete the order for the provided order ID
@@ -164,8 +173,6 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
             }
             writeLog("operation: " + query + " result: " + log_message);
         });
-
-        writeLog(query + " " + log_message);
     });
 
     // POST for /orders?order_date&first_name&last_name&address&phone - adds order
@@ -193,17 +200,13 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
             }
             writeLog("operation: " + query + " result: " + log_message);
         });
-
-        writeLog(query + " " + log_message);
     });
 
-    // POST for /orders?username&password for creating new user
+    // POST for /register?username&password for creating new user
     // req paramdter is the request object - note to get parameters (eg. stuff afer the '?') you must use req.body.param
     // res parameter is the response object
 
     router.post("/register",function(req,res){
-        //console.log("url:", req.url);
-        //console.log("body:", req.body);
         console.log("Adding to users table ", req.body.username,",",req.body.password);
         var password = calculateSaltAndHashForPassword(req.body.password)
         var query = "INSERT INTO ??(??,??,??) VALUES (?,?,?)";
@@ -223,8 +226,48 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
             }
             writeLog("operation: " + query + " result: " + log_message);
         });
+    });
 
-        writeLog(query + " " + log_message);
+    // POST for /login?username&password for login
+    // req paramdter is the request object - note to get parameters (eg. stuff afer the '?') you must use req.body.param
+    // res parameter is the response object
+
+    router.post("/login",function(req,res){
+        console.log("login for ", req.body.username,",",req.body.password);
+        var password = calculateSaltAndHashForPassword(req.body.password)
+        var query = "SELECT * FROM ?? WHERE ??=?";
+        var table = ["users","username", req.body.username];
+        var log_message = "";
+
+        query = mysql.format(query,table);
+        connection.query(query,function(err,rows){
+            if(err) {
+                log_message =  "Error executing MySQL";
+                res.json({"Error" : true, "Message" : log_message, "IsLogin" : false});
+
+            } else {
+                //user not exist
+                if (rows.length == 0)
+                {
+                    log_message =  "Username or password incorrect!";
+                    res.json({"Error" : false, "Message" : log_message, "IsLogin" : false});
+                    return;
+                }
+
+                //pssword wrong
+                if (rows[0]["password"] != calculateHashForPassword(rows[0]["salt"], req.body.password))
+                {
+                    log_message =  "Username or password incorrect!";
+                    res.json({"Error" : false, "Message" : log_message, "IsLogin" : false});
+                    return;
+                }
+
+                log_message =  "Login Success !";
+                res.json({"Error" : false, "Message" : log_message, "IsLogin" : true});
+
+            }
+            writeLog("operation: " + query + " result: " + log_message);
+        });
     });
 
 }

@@ -48,6 +48,9 @@ public class OrdersUI
 		String password1 = null;                    // password1 for registter
 		String password2 = null;                    // password2 for regirster
 
+		String login_username = null;               // user name for login
+		String login_password = null;               // password for login
+
 		/////////////////////////////////////////////////////////////////////////////////
 		// Main UI loop
 		/////////////////////////////////////////////////////////////////////////////////
@@ -71,13 +74,35 @@ public class OrdersUI
 			//keyboard.nextLine();	// Removes data from keyboard buffer. If you don't clear the buffer, you blow 
 									// through the next call to nextLine()
 
-
-
 			//////////// option 1 ////////////
 
 			//option 1 for login
 			if ( option.equals("1") )
 			{
+				System.out.print( "Enter the username: " );
+				login_username = keyboard.nextLine(); // enter user name
+
+				System.out.print( "Enter the password: " );
+				login_password = keyboard.nextLine(); // enter password
+
+				try
+				{
+					response = api.login(login_username, login_password);
+					System.out.println(response);
+					
+					// if (json_test["IsLogin"])
+					// {
+					// 	login_username = null;
+					// 	login_password = null;
+					// }
+
+				} catch (Exception e) {
+
+					System.out.println("Request failed:: " + e);
+					login_username = null;
+					login_password = null;
+				}
+
 				System.out.println("\nPress enter to continue..." );
 				c.readLine();
 			}
@@ -146,6 +171,12 @@ public class OrdersUI
 
 			else if ( option.equals("3") )
 			{
+				//user should login first
+				if (login_username == null)
+				{
+					System.out.println( "\nPlease login first!" );
+					continue;
+				}
 				// Here we retrieve all the orders in the order database
 
 				System.out.println( "\nRetrieving All Orders::" );
@@ -170,6 +201,11 @@ public class OrdersUI
 			//option 4 for retrieve specific order
 			else if ( option.equals("4") )
 			{
+				if (login_username == null)
+				{
+					System.out.println( "\nPlease login first!" );
+					continue;
+				}
 				// Here we get the order ID from the user
 
 				error = true;
@@ -213,6 +249,11 @@ public class OrdersUI
 			//option 5 create a new order
 			else if ( option.equals("5") )
 			{
+				if (login_username == null)
+				{
+					System.out.println( "\nPlease login first!" );
+					continue;
+				}
 				// Here we create a new order entry in the database
 
 				dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -274,6 +315,12 @@ public class OrdersUI
 			//option 6 delete an order
 			else if ( option.equals("6") )
 			{
+				if (login_username == null)
+				{
+					System.out.println( "\nPlease login first!" );
+					continue;
+				}
+
 				error = true;
 
 				while (error)
