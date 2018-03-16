@@ -38,7 +38,7 @@ public class WSClientAPI
 	* Returns: String of all the current orders in the orderinfo database
 	********************************************************************************/
 
-	public String retrieveOrders() throws Exception
+	public String retrieveOrders(String username, String token) throws Exception
 	{
 		// Set up the URL and connect to the node server
 
@@ -49,8 +49,9 @@ public class WSClientAPI
 
 		//Form the request header and instantiate the response code
 		con.setRequestMethod("GET");
+		con.setRequestProperty("username", username);
+		con.setRequestProperty("token", token);
 		int responseCode = con.getResponseCode();
-
 
 		//Set up a buffer to read the response from the server
 		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -77,7 +78,7 @@ public class WSClientAPI
 	*		   orderinfo database.
 	********************************************************************************/
 
-	public String retrieveOrders(String id) throws Exception
+	public String retrieveOrders(String id, String username, String token) throws Exception
 	{
 		// Set up the URL and connect to the node server
 		String url = "http://localhost:3000/api/orders/"+id;
@@ -86,6 +87,8 @@ public class WSClientAPI
 
 		//Form the request header and instantiate the response code
 		con.setRequestMethod("GET");
+		con.setRequestProperty("username", username);
+		con.setRequestProperty("token", token);
 		int responseCode = con.getResponseCode();
 
 		//Set up a buffer to read the response from the server
@@ -114,7 +117,7 @@ public class WSClientAPI
 	*		   orderinfo database.
 	********************************************************************************/
 
-	public String deleteOrders(String id) throws Exception
+	public String deleteOrders(String id, String username, String token) throws Exception
 	{
 		// Set up the URL and connect to the node server
 		String url = "http://localhost:3000/api/orders/"+id;
@@ -123,6 +126,8 @@ public class WSClientAPI
 
 		//Form the request header and instantiate the response code
 		con.setRequestMethod("DELETE");
+		con.setRequestProperty("username", username);
+		con.setRequestProperty("token", token);
 		int responseCode = con.getResponseCode();
 
 		//Set up a buffer to read the response from the server
@@ -149,7 +154,7 @@ public class WSClientAPI
 	* Returns: String that contains the status of the POST operation
 	********************************************************************************/
 
-   	public String newOrder(String Date, String FirstName, String LastName, String Address, String Phone) throws Exception
+   	public String newOrder(String Date, String FirstName, String LastName, String Address, String Phone, String username, String token) throws Exception
 	{
 		// Set up the URL and connect to the node server		
 		URL url = new URL("http://localhost:3000/api/orders");
@@ -165,6 +170,8 @@ public class WSClientAPI
         conn.setRequestProperty("Content-length", Integer.toString(input.length()));
         conn.setRequestProperty("Content-Language", "en-GB");
         conn.setRequestProperty("charset", "utf-8");
+        conn.setRequestProperty("username", username);
+		conn.setRequestProperty("token", token);
         conn.setUseCaches(false);
         conn.setDoOutput(true);
 

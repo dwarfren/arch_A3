@@ -23,6 +23,8 @@ import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.io.Console;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class OrdersUI
 {
@@ -44,12 +46,9 @@ public class OrdersUI
 		LocalDate localDate = null;					// Date object
 		WSClientAPI api = new WSClientAPI();	    // RESTful api object
 
-		String username = null;                     // user name for register
-		String password1 = null;                    // password1 for registter
-		String password2 = null;                    // password2 for regirster
 
-		String login_username = null;               // user name for login
-		String login_password = null;               // password for login
+		String username = null;                     // user name for login
+		String token = null;                        // token for authorize
 
 		/////////////////////////////////////////////////////////////////////////////////
 		// Main UI loop
@@ -80,27 +79,29 @@ public class OrdersUI
 			if ( option.equals("1") )
 			{
 				System.out.print( "Enter the username: " );
-				login_username = keyboard.nextLine(); // enter user name
+				String login_username = keyboard.nextLine(); // enter user name
 
 				System.out.print( "Enter the password: " );
-				login_password = keyboard.nextLine(); // enter password
+				String login_password = keyboard.nextLine(); // enter password
 
 				try
 				{
 					response = api.login(login_username, login_password);
 					System.out.println(response);
-					
-					// if (json_test["IsLogin"])
-					// {
-					// 	login_username = null;
-					// 	login_password = null;
-					// }
+
+					//if login success, token will be returned
+					String pattern = "\"token\":\"(.*)@\"";
+					Pattern r = Pattern.compile(pattern);
+					Matcher m = r.matcher(response);
+					//assign the token and username
+					if (m.find()) {
+						username = login_username;
+						token = m.group(1);
+					}
 
 				} catch (Exception e) {
 
 					System.out.println("Request failed:: " + e);
-					login_username = null;
-					login_password = null;
 				}
 
 				System.out.println("\nPress enter to continue..." );
@@ -113,14 +114,16 @@ public class OrdersUI
 			else if ( option.equals("2") )
 			{
 				System.out.println( "\nRegister - Provide the username and password::" );
-				
+				String reg_username = null;
+				String reg_password1 = null;
+				String reg_password2 = null;
 
 				error = false;
 				while (!error) 
 				{
 					System.out.print( "Enter the username: " );
-					username = keyboard.nextLine(); // enter user name
-					if (username.length() > 256) // length of the username should be <= 256
+					reg_username = keyboard.nextLine(); // enter user name
+					if (reg_username.length() > 256) // length of the username should be <= 256
 					{
 						System.out.print( "The length of the username should be no more than 256, please input again!\n" );
 					}
@@ -136,11 +139,11 @@ public class OrdersUI
 				{
 					//enter password twice
 					System.out.print( "Enter the password: " );
-					password1 = keyboard.nextLine();
+					reg_password1 = keyboard.nextLine();
 					System.out.print( "Enter the password again: " );
-					password2 = keyboard.nextLine();
+					reg_password2 = keyboard.nextLine();
 
-					if (password1.equals(password2))// two input should be the same
+					if (reg_password1.equals(reg_password2))// two input should be the same
 					{
 						error = true;
 					}
@@ -152,7 +155,7 @@ public class OrdersUI
 
 				try
 				{
-					response = api.createUser(username, password1);
+					response = api.createUser(reg_username, reg_password1);
 					System.out.println(response);
 
 				} catch (Exception e) {
@@ -172,7 +175,7 @@ public class OrdersUI
 			else if ( option.equals("3") )
 			{
 				//user should login first
-				if (login_username == null)
+				if (token == null || username == null)
 				{
 					System.out.println( "\nPlease login first!" );
 					continue;
@@ -182,7 +185,7 @@ public class OrdersUI
 				System.out.println( "\nRetrieving All Orders::" );
 				try
 				{
-					response = api.retrieveOrders();
+					response = api.retrieveOrders(username, token);
 					System.out.println(response);
 
 				} catch (Exception e) {
@@ -201,7 +204,7 @@ public class OrdersUI
 			//option 4 for retrieve specific order
 			else if ( option.equals("4") )
 			{
-				if (login_username == null)
+				if (token == null)
 				{
 					System.out.println( "\nPlease login first!" );
 					continue;
@@ -230,7 +233,7 @@ public class OrdersUI
 
 				try
 				{
-					response = api.retrieveOrders(orderid);
+					response = api.retrieveOrders(orderid, username, token);
 					System.out.println(response);
 
 				} catch (Exception e) {
@@ -249,7 +252,7 @@ public class OrdersUI
 			//option 5 create a new order
 			else if ( option.equals("5") )
 			{
-				if (login_username == null)
+				if (token == null)
 				{
 					System.out.println( "\nPlease login first!" );
 					continue;
@@ -289,7 +292,7 @@ public class OrdersUI
 					try
 					{
 						System.out.println("\nCreating order...");
-						response = api.newOrder(date, first, last, address, phone);
+						response = api.newOrder(date, first, last, address, phone, username, token);
 						System.out.println(response);
 
 					} catch(Exception e) {
@@ -315,7 +318,7 @@ public class OrdersUI
 			//option 6 delete an order
 			else if ( option.equals("6") )
 			{
-				if (login_username == null)
+				if (token == null)
 				{
 					System.out.println( "\nPlease login first!" );
 					continue;
@@ -343,7 +346,7 @@ public class OrdersUI
 
 				try
 				{
-					response = api.deleteOrders(orderid);
+					response = api.deleteOrders(orderid, username, token);
 					System.out.println(response);
 
 				} catch (Exception e) {
