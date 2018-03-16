@@ -243,7 +243,7 @@ public class OrdersUI
 
 				try
 				{
-					response = api.retrieveOrders(orderid);
+					response = api.deleteOrders(orderid);
 					System.out.println(response);
 
 				} catch (Exception e) {
@@ -252,8 +252,6 @@ public class OrdersUI
 					
 				}
 
-				System.out.println("\nPress enter to continue..." );
-				c.readLine();
 				System.out.println("\nPress enter to continue..." );
 				c.readLine();
 			}

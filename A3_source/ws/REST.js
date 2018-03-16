@@ -72,6 +72,26 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
         var query = "SELECT * FROM ?? WHERE ??=?";
         var table = ["orders","order_id",req.params.order_id];
         query = mysql.format(query,table);
+        console.log("query: ", query );
+        connection.query(query,function(err,rows){
+            if(err) {
+                res.json({"Error" : true, "Message" : "Error executing MySQL query"});
+            } else {
+                res.json({"Error" : false, "Message" : "Success", "Users" : rows});
+            }
+        });
+    });
+
+    // DELETE for /orders/order id specifier - delete the order for the provided order ID
+    // req paramdter is the request object
+    // res parameter is the response object
+
+    router.delete("/orders/:order_id",function(req,res){
+        console.log("Deleting order ID: ", req.params.order_id );
+        var query = "DELETE FROM ?? WHERE ??=?";
+        var table = ["orders","order_id",req.params.order_id];
+        query = mysql.format(query,table);
+        console.log("query: ", query );
         connection.query(query,function(err,rows){
             if(err) {
                 res.json({"Error" : true, "Message" : "Error executing MySQL query"});
