@@ -29,11 +29,11 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
 { 
     // Set up the JDBC driver name and database URL
     static final String JDBC_CONNECTOR = "com.mysql.jdbc.Driver";  
-    static final String DB_URL = "jdbc:mysql://localhost/ms_orderinfo?autoReconnect=true&useSSL=false";
+    static final String DB_URL = "jdbc:mysql://18.217.158.102/ms_orderinfo?autoReconnect=true&useSSL=false";
 
     // Set up the orderinfo database credentials
     static final String USER = "root";
-    static final String PASS = "password"; //replace with your MySQL root password
+    static final String PASS = "Renhao250"; //replace with your MySQL root password
 
     // Do nothing constructor
     public RetrieveServices() throws RemoteException {}
@@ -43,8 +43,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
     { 	
     	// What we do is bind to rmiregistry, in this case localhost, port 1099. This is the default
     	// RMI port. Note that I use rebind rather than bind. This is better as it lets you start
-    	// and restart without having to shut down the rmiregistry. 
-
+    	// and restart without having to shut down the rmiregistry.
         try 
         { 
             RetrieveServices obj = new RetrieveServices();
@@ -77,11 +76,9 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         {
             // Here we load and initialize the JDBC connector. Essentially a static class
             // that is used to provide access to the database from inside this class.
-
             Class.forName(JDBC_CONNECTOR);
 
             //Open the connection to the orderinfo database
-
             //System.out.println("Connecting to database...");
             conn = DriverManager.getConnection(DB_URL,USER,PASS);
 
@@ -93,7 +90,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
             stmt = conn.createStatement();
             
             String sql;
-            sql = "SELECT * FROM Orders";
+            sql = "SELECT * FROM orders";
             ResultSet rs = stmt.executeQuery(sql);
 
             //Extract data from result set

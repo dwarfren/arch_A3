@@ -38,9 +38,9 @@ public class MSClientAPI
 
 	public String retrieveOrders() throws Exception
 	{
-           RetrieveServicesAI obj = (RetrieveServicesAI) Naming.lookup("RetrieveServices");  
-           response = obj.retrieveOrders();
-           return(response);
+	   RetrieveServicesAI obj = (RetrieveServicesAI) Naming.lookup("RetrieveServices");
+	   response = obj.retrieveOrders();
+	   return(response);
 	}
 	
 	/********************************************************************************
@@ -72,6 +72,23 @@ public class MSClientAPI
            response = obj.newOrder(Date, FirstName, LastName, Address, Phone);
            return(response);	
 		
+    }
+
+    /********************************************************************************
+     * Description: delete the order based on the id argument provided from the
+     *              orderinfo database. Note that this method is serviced by the
+     *			   DeleteService server process.
+     * Parameters: None
+     * Returns: String of all the order corresponding to the order id argument
+     *          in the orderinfo database.
+     ********************************************************************************/
+
+    public String deleteOrders(String id) throws Exception
+    {
+        DeleteServicesAI obj = (DeleteServicesAI) Naming.lookup("DeleteServices");
+        response = obj.deleteOrders(id);
+        return(response);
+
     }
 
 }
