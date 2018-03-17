@@ -33,7 +33,7 @@ public interface RetrieveServicesAI extends java.rmi.Remote
 	* format.
 	*******************************************************/
 
-	String retrieveOrders() throws RemoteException;
+	String retrieveOrders(String username, String token) throws RemoteException;
 
 	/*******************************************************
 	* Retrieves the order corresponding to the order id in 

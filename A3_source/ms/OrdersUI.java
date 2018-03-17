@@ -84,11 +84,11 @@ public class OrdersUI
 
                 try
                 {
-                    //response = api.login(login_username, login_password);
+                    response = api.login(login_username, login_password);
                     System.out.println(response);
 
                     //if login success, token will be returned
-                    String pattern = "\"token\":\"(.*)@\"";
+                    String pattern = "token:(.*)@";
                     Pattern r = Pattern.compile(pattern);
                     Matcher m = r.matcher(response);
                     //assign the token and username
@@ -153,7 +153,7 @@ public class OrdersUI
 
                 try
                 {
-                    //response = api.createUser(reg_username, reg_password1);
+                    response = api.newUser(reg_username, reg_password1);
                     System.out.println(response);
 
                 } catch (Exception e) {
@@ -170,18 +170,18 @@ public class OrdersUI
 			else if ( option.equals("3") )
 			{
                 //user should login first
-//                if (token == null || username == null)
-//                {
-//                    System.out.println( "\nPlease login first!" );
-//                    continue;
-//                }
+                if (token == null || username == null)
+                {
+                    System.out.println( "\nPlease login first!" );
+                    continue;
+                }
 
 				// Here we retrieve all the orders in the ms_orderinfo database
 
 				System.out.println( "\nRetrieving All Orders::" );
 				try
 				{
-					response = api.retrieveOrders();
+					response = api.retrieveOrders(username, token);
 					System.out.println(response);
 
 				} catch (Exception e) {

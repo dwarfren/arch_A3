@@ -36,10 +36,10 @@ public class MSClientAPI
 	* Returns: String of all the current orders in the orderinfo database
 	********************************************************************************/
 
-	public String retrieveOrders() throws Exception
+	public String retrieveOrders(String username, String token) throws Exception
 	{
 	   RetrieveServicesAI obj = (RetrieveServicesAI) Naming.lookup("RetrieveServices");
-	   response = obj.retrieveOrders();
+	   response = obj.retrieveOrders(username, token);
 	   return(response);
 	}
 	
@@ -90,5 +90,36 @@ public class MSClientAPI
         return(response);
 
     }
+
+    /********************************************************************************
+     * Description: create a new user. Note that this method is serviced by the
+     *			   RegService server process.
+     * Parameters: None
+     * Returns: the result of creating the user
+     ********************************************************************************/
+
+    public String newUser(String username, String password) throws Exception
+    {
+        RegServicesAI obj = (RegServicesAI) Naming.lookup("RegServices");
+        response = obj.newUser(username, password);
+        return(response);
+
+    }
+
+    /********************************************************************************
+     * Description: login. Note that this method is serviced by the
+     *			   RegService server process.
+     * Parameters: None
+     * Returns: the result of login
+     ********************************************************************************/
+
+    public String login(String username, String password) throws Exception
+    {
+        LoginServicesAI obj = (LoginServicesAI) Naming.lookup("LoginServices");
+        response = obj.login(username, password);
+        return(response);
+
+    }
+
 
 }

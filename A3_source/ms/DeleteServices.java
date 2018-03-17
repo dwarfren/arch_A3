@@ -97,7 +97,7 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
             stmt.executeUpdate(sql);
 
             //Clean-up environment
-            
+
             stmt.close();
             conn.close();
             stmt.close(); 
