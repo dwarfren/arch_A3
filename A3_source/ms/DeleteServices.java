@@ -61,10 +61,10 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
 
 
 
-    // This method will returns the order in the orderinfo database corresponding to the id
+    // This method will delete the order in the orderinfo database corresponding to the id
     // provided in the argument.
 
-    public String deleteOrders(String orderid) throws RemoteException
+    public String deleteOrders(String orderid, String username, String token) throws RemoteException
     {
       	// Local declarations
 
@@ -91,13 +91,27 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
 
             // System.out.println("Creating statement...");
             stmt = conn.createStatement();
-            
+
             String sql;
-            sql = "DELETE FROM orders where order_id=" + orderid;
-            stmt.executeUpdate(sql);
+            sql = "SELECT * FROM users where username=" + "\"" + username + "\"";
+            ResultSet rs_login = stmt.executeQuery(sql);
+
+            // if the user is authorized
+            if (rs_login.next() && token.equals(rs_login.getString("token")) )
+            {
+                sql = "DELETE FROM orders where order_id=" + orderid;
+                if (stmt.executeUpdate(sql) == 0)
+                {
+                    ReturnString = "Order not exist!";
+                }
+            }
+            else
+            {
+                ReturnString = "Result: Fail, Reason: user not authorized";
+            }
 
             //Clean-up environment
-
+            rs_login.close();
             stmt.close();
             conn.close();
             stmt.close(); 

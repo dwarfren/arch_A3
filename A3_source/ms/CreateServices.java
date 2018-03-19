@@ -64,7 +64,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
 
     // This method add the entry into the ms_orderinfo database
 
-    public String newOrder(String idate, String ifirst, String ilast, String iaddress, String iphone) throws RemoteException
+    public String newOrder(String idate, String ifirst, String ilast, String iaddress, String iphone, String username, String token) throws RemoteException
     {
       	// Local declarations
 
@@ -89,15 +89,24 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
             // that we are connected to (via JDBC in this case).
 
             stmt = conn.createStatement();
-            
-            String sql = "INSERT INTO orders(order_date, first_name, last_name, address, phone) VALUES (\""+idate+"\",\""+ifirst+"\",\""+ilast+"\",\""+iaddress+"\",\""+iphone+"\")";
 
-            // execute the update
+            String sql;
+            sql = "SELECT * FROM users where username=" + "\"" + username + "\"";
+            ResultSet rs_login = stmt.executeQuery(sql);
 
-            stmt.executeUpdate(sql);
+            // if the user is authorized
+            if (rs_login.next() && token.equals(rs_login.getString("token")) )
+            {
+                sql = "INSERT INTO orders(order_date, first_name, last_name, address, phone) VALUES (\""+idate+"\",\""+ifirst+"\",\""+ilast+"\",\""+iaddress+"\",\""+iphone+"\")";
+                stmt.executeUpdate(sql);
+            }
+            else
+            {
+                ReturnString = "Result: Fail, Reason: user not authorized";
+            }
 
             // clean up the environment
-
+            rs_login.close();
             stmt.close();
             conn.close();
             stmt.close(); 

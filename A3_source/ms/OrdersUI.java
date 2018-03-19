@@ -97,10 +97,14 @@ public class OrdersUI
                         token = m.group(1);
                     }
 
+                    api.writeLog("user: " + username + " operation: login result: " + response + "\n");
+
                 } catch (Exception e) {
 
                     System.out.println("Request failed:: " + e);
                 }
+
+
 
                 System.out.println("\nPress enter to continue..." );
                 c.readLine();
@@ -155,6 +159,7 @@ public class OrdersUI
                 {
                     response = api.newUser(reg_username, reg_password1);
                     System.out.println(response);
+                    api.writeLog("user: " + username + " operation: register result: " + response + "\n");
 
                 } catch (Exception e) {
 
@@ -183,6 +188,7 @@ public class OrdersUI
 				{
 					response = api.retrieveOrders(username, token);
 					System.out.println(response);
+                    api.writeLog("user: " + username + " operation: retrieve all orders result: " + response + "\n");
 
 				} catch (Exception e) {
 
@@ -200,11 +206,11 @@ public class OrdersUI
 			else if ( option.equals("4") )
 			{
                 //user should login first
-//                if (token == null || username == null)
-//                {
-//                    System.out.println( "\nPlease login first!" );
-//                    continue;
-//                }
+                if (token == null || username == null)
+                {
+                    System.out.println( "\nPlease login first!" );
+                    continue;
+                }
 				// Here we get the order ID from the user
 
 				error = true;
@@ -229,14 +235,16 @@ public class OrdersUI
 
 				try
 				{
-					response = api.retrieveOrders(orderid);
+					response = api.retrieveOrders(orderid, username, token);
 					System.out.println(response);
+                    api.writeLog("user: " + username + " operation: retrieve specific order " + orderid +  " result: " + response + "\n");
 
 				} catch (Exception e) {
 
 					System.out.println("Request failed:: " + e);
 					
 				}
+
 
 				System.out.println("\nPress enter to continue..." );
 				c.readLine();
@@ -248,11 +256,11 @@ public class OrdersUI
 			else if ( option.equals("5") )
 			{
                 //user should login first
-//                if (token == null || username == null)
-//                {
-//                    System.out.println( "\nPlease login first!" );
-//                    continue;
-//                }
+                if (token == null || username == null)
+                {
+                    System.out.println( "\nPlease login first!" );
+                    continue;
+                }
 
 				// Here we create a new order entry in the database
 
@@ -289,8 +297,9 @@ public class OrdersUI
 					try
 					{
 						System.out.println("\nCreating order...");
-						response = api.newOrder(date, first, last, address, phone);
+						response = api.newOrder(date, first, last, address, phone, username, token);
 						System.out.println(response);
+                        api.writeLog("user: " + username + " operation: add order result: " + response + "\n");
 
 					} catch(Exception e) {
 
@@ -303,6 +312,7 @@ public class OrdersUI
 					System.out.println("\nOrder not created...");
 				}
 
+
 				System.out.println("\nPress enter to continue..." );
 				c.readLine();
 
@@ -314,11 +324,11 @@ public class OrdersUI
             else if ( option.equals("6") )
             {
                 //user should login first
-//                if (token == null || username == null)
-//                {
-//                    System.out.println( "\nPlease login first!" );
-//                    continue;
-//                }
+                if (token == null || username == null)
+                {
+                    System.out.println( "\nPlease login first!" );
+                    continue;
+                }
 
                 error = true;
 
@@ -342,8 +352,9 @@ public class OrdersUI
 
                 try
                 {
-                    response = api.deleteOrders(orderid);
+                    response = api.deleteOrders(orderid, username, token);
                     System.out.println(response);
+                    api.writeLog("user: " + username + " operation: delete specific order " + orderid +  " result: " + response + "\n");
 
                 } catch (Exception e) {
 

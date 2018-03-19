@@ -90,7 +90,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
             stmt = conn.createStatement();
 
             String sql;
-            sql = "SELECT * FROM users where username=" + username;
+            sql = "SELECT * FROM users where username=" + "\"" + username + "\"";
             ResultSet rs_login = stmt.executeQuery(sql);
 
             // if the user is authorized
@@ -143,7 +143,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
     // This method will returns the order in the orderinfo database corresponding to the id
     // provided in the argument.
 
-    public String retrieveOrders(String orderid) throws RemoteException
+    public String retrieveOrders(String orderid, String username, String token) throws RemoteException
     {
       	// Local declarations
 
@@ -170,42 +170,45 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
 
             // System.out.println("Creating statement...");
             stmt = conn.createStatement();
-            
+
             String sql;
-            sql = "SELECT * FROM orders where order_id=" + orderid;
-            ResultSet rs = stmt.executeQuery(sql);
+            sql = "SELECT * FROM users where username=" + "\"" + username + "\"";
+            ResultSet rs_login = stmt.executeQuery(sql);
 
-            // Extract data from result set. Note there should only be one for this method.
-            // I used a while loop should there every be a case where there might be multiple
-            // orders for a single ID.
-
-            while(rs.next())
+            // if the user is authorized
+            if (rs_login.next() && token.equals(rs_login.getString("token")) )
             {
-                //Retrieve by column name
-                int id  = rs.getInt("order_id");
-                String date = rs.getString("order_date");
-                String first = rs.getString("first_name");
-                String last = rs.getString("last_name");
-                String address = rs.getString("address");
-                String phone = rs.getString("phone");
+                sql = "SELECT * FROM orders where order_id=" + orderid;
+                ResultSet rs = stmt.executeQuery(sql);
 
-                //Display values
-                //System.out.print("ID: " + id);
-                //System.out.print(", date: " + date);
-                //System.out.print(", first: " + first);
-                //System.out.print(", last: " + last);
-                //System.out.print(", address: " + address);
-                //System.out.println("phone:"+phone);
+                // Extract data from result set. Note there should only be one for this method.
+                // I used a while loop should there every be a case where there might be multiple
+                // orders for a single ID.
+                while(rs.next())
+                {
+                    //Retrieve by column name
+                    int id  = rs.getInt("order_id");
+                    String date = rs.getString("order_date");
+                    String first = rs.getString("first_name");
+                    String last = rs.getString("last_name");
+                    String address = rs.getString("address");
+                    String phone = rs.getString("phone");
 
-                ReturnString = ReturnString +"{order_id:"+id+", order_date:"+date+", first_name:"+first+", last_name:"
-                               +last+", address:"+address+", phone:"+phone+"}";
+                    ReturnString = ReturnString +"{order_id:"+id+", order_date:"+date+", first_name:"+first+", last_name:"
+                            +last+", address:"+address+", phone:"+phone+"}";
+                }
+
+                ReturnString = ReturnString +"]";
+                rs.close();
             }
-
-            ReturnString = ReturnString +"]";
+            else
+            {
+                ReturnString = "Result: Fail, Reason: user not authorized";
+            }
 
             //Clean-up environment
 
-            rs.close();
+            rs_login.close();
             stmt.close();
             conn.close();
             stmt.close(); 

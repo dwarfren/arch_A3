@@ -52,10 +52,10 @@ public class MSClientAPI
 	*          in the orderinfo database.
 	********************************************************************************/
 
-	public String retrieveOrders(String id) throws Exception
+	public String retrieveOrders(String id, String username, String token) throws Exception
 	{
            RetrieveServicesAI obj = (RetrieveServicesAI) Naming.lookup("RetrieveServices");  
-           response = obj.retrieveOrders(id);
+           response = obj.retrieveOrders(id, username, token);
            return(response);	
 
 	}
@@ -66,10 +66,10 @@ public class MSClientAPI
 	* Returns: String that contains the status of the create operatation
 	********************************************************************************/
 
-   	public String newOrder(String Date, String FirstName, String LastName, String Address, String Phone) throws Exception
+   	public String newOrder(String Date, String FirstName, String LastName, String Address, String Phone, String username, String token) throws Exception
 	{
            CreateServicesAI obj = (CreateServicesAI) Naming.lookup("CreateServices"); 
-           response = obj.newOrder(Date, FirstName, LastName, Address, Phone);
+           response = obj.newOrder(Date, FirstName, LastName, Address, Phone, username, token);
            return(response);	
 		
     }
@@ -83,10 +83,10 @@ public class MSClientAPI
      *          in the orderinfo database.
      ********************************************************************************/
 
-    public String deleteOrders(String id) throws Exception
+    public String deleteOrders(String id, String username, String token) throws Exception
     {
         DeleteServicesAI obj = (DeleteServicesAI) Naming.lookup("DeleteServices");
-        response = obj.deleteOrders(id);
+        response = obj.deleteOrders(id, username, token);
         return(response);
 
     }
@@ -118,6 +118,19 @@ public class MSClientAPI
         LoginServicesAI obj = (LoginServicesAI) Naming.lookup("LoginServices");
         response = obj.login(username, password);
         return(response);
+
+    }
+
+    /********************************************************************************
+     * Description: write lig
+     * Parameters: log content
+     * Returns: None
+     ********************************************************************************/
+
+    public void writeLog(String content) throws Exception
+    {
+        LogServicesAI obj = (LogServicesAI) Naming.lookup("LogServices");
+        obj.writeLog(content);
 
     }
 
