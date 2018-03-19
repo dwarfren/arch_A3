@@ -17,8 +17,7 @@
 * Parameters: None
 *
 * Internal Methods:
-*  String retrieveOrders() - gets and returns all the orders in the orderinfo database
-*  String retrieveOrders(String id) - gets and returns the order associated with the order id
+*  String deleteOrders(String id) - delete the order record by order id
 *
 * External Dependencies: None
 ******************************************************************************************************************/

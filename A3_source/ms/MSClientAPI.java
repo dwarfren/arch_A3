@@ -16,8 +16,10 @@
 *  String retrieveOrders(String id) - gets and returns the order associated with the order id
 *  String newOrder(String Date, String FirstName, String LastName, String Address, String Phone) - creates a new 
 *  order in the orderinfo database
-*
-*
+* String deleteOrders(String id, String username, String token) - delete order record by order id
+* String newUser(String username, String password) - register new user
+ * String login(String username, String password) - user login
+ * void writeLog(String content) - write log into file
 * External Dependencies: None
 ******************************************************************************************************************/
 

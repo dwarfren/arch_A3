@@ -119,6 +119,6 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
         
         return(ReturnString);
 
-    } //retrieve all orders
+    } //new order
 
-} // RetrieveServices
+} // CreateServices
