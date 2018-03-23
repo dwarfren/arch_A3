@@ -28,7 +28,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
 { 
     // Set up the JDBC driver name and database URL
     static final String JDBC_CONNECTOR = "com.mysql.jdbc.Driver";  
-    static final String DB_URL = "jdbc:mysql://18.217.158.102/ms_orderinfo?autoReconnect=true&useSSL=false";
+    static final String DB_URL = "jdbc:mysql://localhost/ms_orderinfo?autoReconnect=true&useSSL=false";
 
     // Set up the orderinfo database credentials
     static final String USER = "root";

@@ -1,18 +1,18 @@
 /******************************************************************************************************************
-* File: DeleteServices.java
+* File: LoginServices.java
 * Course: 17655
 * Project: Assignment A3
 * Copyright: Copyright (c) 2018 Carnegie Mellon University
 * Versions:
 *	1.0 February 2018 - Initial write of assignment 3 (ajl).
 *
-* Description: This class provides the concrete implementation of the delete micro services. These services run
+* Description: This class provides the concrete implementation of the login micro services. These services run
 * in their own process (JVM).
 *
 * Parameters: None
 *
 * Internal Methods:
-*  String deleteOrders(String id) - delete and returns the order associated with the order id
+*  String login() - check if the username and password are correct
 *
 * External Dependencies: 
 *	- rmiregistry must be running to start this server
@@ -23,8 +23,11 @@ import java.rmi.Naming;
 import java.rmi.RemoteException; 
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
 
-public class DeleteServices extends UnicastRemoteObject implements DeleteServicesAI
+public class LoginServices extends UnicastRemoteObject implements LoginServicesAI
 { 
     // Set up the JDBC driver name and database URL
     static final String JDBC_CONNECTOR = "com.mysql.jdbc.Driver";  
@@ -35,7 +38,7 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
     static final String PASS = "Renhao250"; //replace with your MySQL root password
 
     // Do nothing constructor
-    public DeleteServices() throws RemoteException {}
+    public LoginServices() throws RemoteException {}
 
     // Main service loop
     public static void main(String args[]) 
@@ -44,33 +47,30 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
     	// RMI port. Note that I use rebind rather than bind. This is better as it lets you start
     	// and restart without having to shut down the rmiregistry.
         try 
-        {
-            DeleteServices obj = new DeleteServices();
+        { 
+            LoginServices obj = new LoginServices();
 
             // Bind this object instance to the name RetrieveServices in the rmiregistry 
-            Naming.rebind("//localhost:1099/DeleteServices", obj);
+            Naming.rebind("//localhost:1099/LoginServices", obj);
 
         } catch (Exception e) {
 
-            System.out.println("DeleteServices binding err: " + e.getMessage());
+            System.out.println("LoginServices binding err: " + e.getMessage());
             e.printStackTrace();
         } 
 
     } // main
 
-
-
-
-    // This method will delete the order in the orderinfo database corresponding to the id
+    // This method will check the username and password
     // provided in the argument.
 
-    public String deleteOrders(String orderid, String username, String token) throws RemoteException
+    public String login(String username, String password) throws RemoteException
     {
       	// Local declarations
 
         Connection conn = null;		// connection to the orderinfo database
         Statement stmt = null;		// A Statement object is an interface that represents a SQL statement.
-        String ReturnString = "Order deleted";	// Return string. If everything works you get an ordered pair of data
+        String ReturnString = null;	// Return string. If everything works you get an ordered pair of data
         							// if not you get an error string
 
         try
@@ -91,27 +91,45 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
 
             // System.out.println("Creating statement...");
             stmt = conn.createStatement();
-
+            
             String sql;
             sql = "SELECT * FROM users where username=" + "\"" + username + "\"";
-            ResultSet rs_login = stmt.executeQuery(sql);
+            ResultSet rs = stmt.executeQuery(sql);
 
-            // if the user is authorized
-            if (rs_login.next() && token.equals(rs_login.getString("token")) )
+            String salt = null;
+            String hash = null;
+            String token = null;
+
+
+
+            // Extract data from result set. Note there should only be one for this method.
+            // I used a while loop should there every be a case where there might be multiple
+            // orders for a single ID.
+
+            if (rs.next())
             {
-                sql = "DELETE FROM orders where order_id=" + orderid;
-                if (stmt.executeUpdate(sql) == 0)
+                //Retrieve by column name
+                salt = rs.getString("salt");
+                hash = rs.getString("password");
+                token = rs.getString("token");
+
+                if ( hash.equals(calculateHashForPassword(password, salt)) )
                 {
-                    ReturnString = "Order not exist!";
+                    ReturnString = "Result: Success, token:" + token + "@";
+                }
+                else
+                {
+                    ReturnString = "Result: Fail, Reason: Username or Password incorrect!";
                 }
             }
             else
             {
-                ReturnString = "Result: Fail, Reason: user not authorized";
+                ReturnString = "Result: Fail, Reason: Username or Password incorrect!";
             }
 
             //Clean-up environment
-            rs_login.close();
+
+            rs.close();
             stmt.close();
             conn.close();
             stmt.close(); 
@@ -125,6 +143,30 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
 
         return(ReturnString);
 
-    } //delete order by id
+    } //login
 
-} // DeleteServices
+    /**
+     * calculate the encrypt password
+     * @param password original password
+     * @param salt the salt
+     * @return the hash value for password
+     */
+    public String calculateHashForPassword(String password, String salt) {
+        String hash = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-512");
+            md.update(salt.getBytes(StandardCharsets.UTF_8));
+            byte[] bytes = md.digest(password.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for(int i=0; i< bytes.length ;i++){
+                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+            }
+            hash = sb.toString();
+        }
+        catch (NoSuchAlgorithmException e){
+            e.printStackTrace();
+        }
+        return hash;
+    }
+
+} // LoginServices
